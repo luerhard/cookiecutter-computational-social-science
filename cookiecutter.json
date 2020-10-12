@@ -1,0 +1,7 @@
+{
+    "project_name": "my_repo",
+    "repo_url": "https://github.com/username/repo",
+    "dvc_remote": "webdavs://mydomain.net/nextcloud/remote.php/dav/files/USERNAME",
+    "username": "OPTIONAL - username",
+    "password": "OPTIONAL - (stored in clear text in the repo! Leave empty and set via 'dvc remote modify remote --local password my_secret_password' otherwise)"
+}
