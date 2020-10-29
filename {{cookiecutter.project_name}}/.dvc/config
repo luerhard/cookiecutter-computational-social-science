@@ -3,8 +3,8 @@
 ['remote "remote"']
     url = {{cookiecutter.dvc_remote}}
     {%- if cookiecutter.username != "OPTIONAL - username" %}
-    user = {{cookiecutter.username}}
+    user = '{{cookiecutter.username}}'
     {%- endif -%}
     {%- if cookiecutter.password != "OPTIONAL - (stored in clear text in the repo! Leave empty and set via 'dvc remote modify remote --local password my_secret_password' otherwise)" %}
-    password = {{cookiecutter.password}}
+    password = '{{cookiecutter.password}}'
     {%- endif -%}
