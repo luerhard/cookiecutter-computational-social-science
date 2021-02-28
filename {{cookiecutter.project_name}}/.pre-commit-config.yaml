@@ -37,6 +37,15 @@ repos:
     -   id: mypy
         additional_dependencies: [sqlalchemy-stubs]
         
+-   repo: local
+    hooks:
+    -   id: pytest
+        name: pytest
+        stages: [commit]
+        language: system
+        entry: pytest
+        types: [python] 
+
 -   repo: https://github.com/iterative/dvc
     rev: v1.11.16
     hooks:
