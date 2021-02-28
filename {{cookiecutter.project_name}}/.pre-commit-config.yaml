@@ -26,7 +26,7 @@ repos:
         args: [--py3-plus]
         
 -   repo: https://github.com/kynan/nbstripout
-    rev: master
+    rev: v0.3.0
     hooks:
     -   id: nbstripout
         args: [--keep-output]
@@ -38,7 +38,7 @@ repos:
         additional_dependencies: [sqlalchemy-stubs]
         
 -   repo: https://github.com/iterative/dvc
-    rev: master
+    rev: v1.11.16
     hooks:
     -   id: dvc-pre-commit
         language_version: python3
