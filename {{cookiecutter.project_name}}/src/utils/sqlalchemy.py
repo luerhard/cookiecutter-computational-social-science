@@ -1,9 +1,11 @@
 import alembic
-import sqlalchemy as sa
-
-from .logging import logger
-from .iterate import chunks
 from tqdm.auto import tqdm
+
+import sqlalchemy as sa
+from sqlalchemy.orm import sessionmaker
+
+from .iterate import chunks
+from .logging import logger
 
 
 def set_fast_sqlite_pragmas(dbapi_connection, connection_record):
@@ -31,18 +33,19 @@ def sa_to_dict(obj):
 
 
 def auto_upgrade_engine(engine, meta):
-
     def flatten_operations(operations):
         def get_op(operation_object):
             if not hasattr(operation_object, "ops"):
                 return operation_object
             return list(map(get_op, operation_object.ops))
-        def flatten_list(l):
-            if isinstance(l, list):
-                return sum(map(flatten_list, l), [])
-            return [l]
-            
+
+        def flatten_list(flatten_this):
+            if isinstance(flatten_this, list):
+                return sum(map(flatten_list, flatten_this), [])
+            return [flatten_this]
+
         return flatten_list(get_op(operations))
+
     connection = engine.connect()
     migration_context = alembic.migration.MigrationContext.configure(connection)
     op = alembic.operations.Operations(migration_context)
@@ -55,15 +58,15 @@ def auto_upgrade_engine(engine, meta):
 
 def copy_database(source_engine, target_engine, metadata: sa.schema.MetaData, chunk_size: int):
 
-    Session_source = sa.orm.sessionmaker(bind=source_engine)
-    Session_dest = sa.orm.sessionmaker(bind=target_engine)
+    Session_source = sessionmaker(bind=source_engine)
+    Session_dest = sessionmaker(bind=target_engine)
     metadata.create_all(bind=target_engine)
     sess_source = Session_source()
 
     for table in metadata.sorted_tables:
         sess_dest = Session_dest()
         table_data = sess_source.query(table).yield_per(chunk_size)
-        bar = tqdm(smoothing=.1, desc=str(table), total=table_data.count())
+        bar = tqdm(smoothing=0.1, desc=str(table), total=table_data.count())
         for chunk in chunks(table_data, chunksize=chunk_size):
             insert = table.insert(values=chunk)
             sess_dest.execute(insert)

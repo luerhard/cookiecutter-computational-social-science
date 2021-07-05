@@ -17,7 +17,6 @@ class cdict(dict):
 
 
 class JSONTreeView:
-
     def __init__(self, max_depth=10, max_nodes=50, percentage=False, horiz_len=1, indent=2, style="BOX_ASCII"):
         """Create a tree object from JSON Data
 
@@ -57,7 +56,6 @@ class JSONTreeView:
         for path in self._append_dots:
             self._walk_tree(self.count_tree, path)["..."] = dict()
         return self.viewer({f"Summary: (Total items: {self.n})": self.count_tree})
-
 
     def _n_label(self, n):
         if self.percentage:

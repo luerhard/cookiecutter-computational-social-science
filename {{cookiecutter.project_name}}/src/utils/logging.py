@@ -4,11 +4,19 @@ import sys
 import multiprocessing_logging
 
 import src
+
 multiprocessing_logging.install_mp_handler()
 
 
-def setup_logging(name="src", filename=src.PATH / "logfile.log", filelevel="INFO", streamlevel="WARNING",
-                  captureWarnings=True, filemode="a+", overwrite=False):
+def setup_logging(
+    name="src",
+    filename=src.PATH / "logfile.log",
+    filelevel="INFO",
+    streamlevel="WARNING",
+    captureWarnings=True,
+    filemode="a+",
+    overwrite=False,
+):
     """creates a logger"""
 
     datefmt = "%H:%M:%S"
