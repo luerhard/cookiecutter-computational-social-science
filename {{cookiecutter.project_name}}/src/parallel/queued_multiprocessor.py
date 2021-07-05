@@ -1,7 +1,6 @@
-from multiprocessing import JoinableQueue, Queue, Process, Event
+from multiprocessing import JoinableQueue, Queue, Process
 import os
 import signal
-import sys
 import time
 
 import setproctitle
@@ -10,10 +9,19 @@ import setproctitle
 class QueuedMultiProcessor:
     STOP_SIGNAL = "STOP"
     QUEUE_SIZE = 1500
-    SLEEP_IF_FULL = .01
+    SLEEP_IF_FULL = 0.01
 
-    def __init__(self, stream, worker, writer, worker_setup=None,
-                 writer_setup=None, writer_teardown=None, logger=None, chunksize=1):
+    def __init__(
+        self,
+        stream,
+        worker,
+        writer,
+        worker_setup=None,
+        writer_setup=None,
+        writer_teardown=None,
+        logger=None,
+        chunksize=1,
+    ):
 
         self.worker = worker
         self.worker_initializer = worker_setup
@@ -27,11 +35,8 @@ class QueuedMultiProcessor:
         self.stream = stream
         self.logger = logger
 
-
         self.processes = []
         self.name = "Main Process"
-
-        
 
     def writer_wrapper(self):
         self.name = "py_WRITER"
@@ -116,4 +121,3 @@ class QueuedMultiProcessor:
     def run(self, n_workers=2):
         setproctitle.setproctitle("py_MAIN")
         self._run(n_workers)
-       
