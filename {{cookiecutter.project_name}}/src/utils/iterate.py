@@ -26,3 +26,9 @@ def chunks(iterable, chunksize=2):
         temp.append(item)
     if temp:
         yield temp
+
+        
+def flatten_list(li):
+    if isinstance(li, list):
+        return sum(map(flatten_list, li), [])
+    return [li]
