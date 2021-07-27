@@ -2,10 +2,9 @@ import alembic
 from tqdm.auto import tqdm
 
 import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker
 
-from .iterate import chunks
-from .logging import logger
+from ..iterate import chunks
+from ..logging import logger
 
 
 def set_fast_sqlite_pragmas(dbapi_connection, connection_record):
@@ -51,25 +50,40 @@ def auto_upgrade_engine(engine, meta):
     op = alembic.operations.Operations(migration_context)
     migration_script = alembic.autogenerate.produce_migrations(migration_context, meta)
     for operation in flatten_operations(migration_script.upgrade_ops):
-        logger.info("auto_upgrade %s: %s", operation.to_diff_tuple()[0].upper(), operation.to_diff_tuple()[1])
+        logger.info(
+            "auto_upgrade %s: %s",
+            operation.to_diff_tuple()[0].upper(),
+            operation.to_diff_tuple()[1],
+        )
         op.invoke(operation)
     connection.close()
 
 
 def copy_database(source_engine, target_engine, metadata: sa.schema.MetaData, chunk_size: int):
 
-    Session_source = sessionmaker(bind=source_engine)
-    Session_dest = sessionmaker(bind=target_engine)
+    if target_engine.dialect.name == "sqlite":
+        sa.event.listen(target_engine, "connect", set_fast_sqlite_pragmas)
+
+    Session_source = sa.orm.sessionmaker(bind=source_engine)
+    Session_dest = sa.orm.sessionmaker(bind=target_engine, autocommit=False)
     metadata.create_all(bind=target_engine)
     sess_source = Session_source()
 
+    # drop index definitions
+    for table in metadata.sorted_tables:
+        for index in table.indexes:
+            index.drop(bind=target_engine)
+
     for table in metadata.sorted_tables:
         sess_dest = Session_dest()
-        table_data = sess_source.query(table).yield_per(chunk_size)
-        bar = tqdm(smoothing=0.1, desc=str(table), total=table_data.count())
-        for chunk in chunks(table_data, chunksize=chunk_size):
-            insert = table.insert(values=chunk)
-            sess_dest.execute(insert)
-            bar.update(chunk_size)
+        query = sess_source.query(table).yield_per(chunk_size)
+        bar = tqdm(smoothing=0.1, desc=str(table), total=query.count())
+        rows = (row._asdict() for row in query)
+        for chunk in chunks(rows, chunksize=chunk_size):
+            sess_dest.execute(table.insert(), chunk)
+            bar.update(len(chunk))
         bar.close()
         sess_dest.commit()
+
+    # recreate indexes
+    auto_upgrade_engine(target_engine, metadata)
