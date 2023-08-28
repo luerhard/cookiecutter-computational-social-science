@@ -1,3 +1,23 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "populism-on-yt"
+version = "0.1.0"
+description = ""
+authors = ["Lukas Erhard <luerhard@googlemail.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.pytest.ini_options]
+markers = [
+  "slow: marks a test as slow",
+]
+pythonpath = [
+  "."
+]
+
 [tool.ruff]
 fix = true
 include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]

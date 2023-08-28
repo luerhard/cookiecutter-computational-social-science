@@ -1,5 +1,6 @@
 import subprocess
 
+
 def run_command(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     while process.stdout.readable():
@@ -12,5 +13,6 @@ def run_command(command):
 print("Installing environment ...")
 run_command("poetry install")
 print("Install pre-commit ...")
-run_command("pre-commit install --hook-type pre-commit --hook-type post-checkout --hook-type pre-push")
-
+run_command(
+    "pre-commit install --hook-type pre-commit --hook-type post-checkout --hook-type pre-push"
+)
