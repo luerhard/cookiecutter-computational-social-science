@@ -1,7 +1,4 @@
-from pathlib import Path
-import os
 import subprocess
-import sys
 
 def run_command(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
