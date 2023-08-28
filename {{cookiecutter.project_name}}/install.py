@@ -11,9 +11,9 @@ def run_command(command):
             break
         print(line.decode().strip())
 
+
 print("Installing environment ...")
-run_command("conda env create --name {{cookiecutter.project_name}} --file env.yaml")
+run_command("poetry install")
 print("Install pre-commit ...")
-run_command("conda run --name {{cookiecutter.project_name}} pre-commit install")
-print("Updating pre-commit hooks ...")
-run_command("conda run --name {{cookiecutter.project_name}} pre-commit autoupdate")
+run_command("pre-commit install --hook-type pre-commit --hook-type post-checkout --hook-type pre-push")
+
